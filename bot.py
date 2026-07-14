@@ -263,8 +263,12 @@ async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
 
 
 async def whoami(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    """Допоміжна команда: показує твій chat_id (для налаштування OWNER_CHAT_ID)."""
-    await update.message.reply_text(f"Ваш chat_id: {update.effective_chat.id}")
+    """Допоміжна команда: показує chat_id та стан налаштувань (для діагностики)."""
+    webapp = WEBAPP_URL if WEBAPP_URL else "❌ НЕ ЗАДАНО"
+    await update.message.reply_text(
+        f"Ваш chat_id: {update.effective_chat.id}\n"
+        f"WEBAPP_URL: {webapp}"
+    )
 
 
 def main() -> None:
