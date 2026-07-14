@@ -18,6 +18,7 @@ from telegram import (
     InlineKeyboardMarkup,
     InputMediaPhoto,
     Update,
+    WebAppInfo,
 )
 from telegram.ext import (
     Application,
@@ -33,6 +34,9 @@ load_dotenv()
 
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 OWNER_CHAT_ID = os.getenv("OWNER_CHAT_ID")  # твій особистий chat_id
+# HTTPS-адреса, де захостено webapp/index.html (GitHub Pages, Netlify, Vercel...).
+# Якщо не задано — кнопка 3D-моделі просто не показується.
+WEBAPP_URL = os.getenv("WEBAPP_URL")
 
 # папка з фото-прикладами (поряд із bot.py)
 PHOTOS_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "photos")
@@ -156,8 +160,19 @@ async def ask_question(
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     context.user_data.clear()
+
+    # Тестовий крок: показуємо 3D-модель у Telegram Web App (якщо задано WEBAPP_URL).
+    if WEBAPP_URL:
+        keyboard = InlineKeyboardMarkup(
+            [[InlineKeyboardButton("🧊 Переглянути 3D-модель", web_app=WebAppInfo(url=WEBAPP_URL))]]
+        )
+        await update.message.reply_text(
+            "Вітаю! 👋 Спершу — тестова 3D-модель. Натисніть кнопку, щоб покрутити її прямо в Telegram:",
+            reply_markup=keyboard,
+        )
+
     await update.message.reply_text(
-        "Вітаю! 👋 Я допоможу зібрати ваші побажання щодо дизайну квартири.\n\n"
+        "Я допоможу зібрати ваші побажання щодо дизайну квартири.\n\n"
         "Для початку — як вас звати? (ім'я)"
     )
     return NAME
